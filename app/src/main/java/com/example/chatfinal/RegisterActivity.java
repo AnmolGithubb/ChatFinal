@@ -11,6 +11,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatfinal.Model.User;
@@ -27,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth auth;
     ProgressDialog progressDialog;
     FirebaseDatabase database;
+    TextView btnAlreadyHaveAccount;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,21 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // code here
-        Rname = findViewById(R.id.Rusername);
-        Remail = findViewById(R.id.Remail);
+        Rname = findViewById(R.id.editTextUserName);
+        Remail = findViewById(R.id.editTextTextEmailAddress);
         Rpass = findViewById(R.id.Rpassword);
         Register = findViewById(R.id.register);
+        btnAlreadyHaveAccount = findViewById(R.id.tvAlreadyHaveAccount);
+
+        btnAlreadyHaveAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+
+            }
+        });
+
+
 
         progressDialog = new ProgressDialog(RegisterActivity.this);
         progressDialog.setTitle("Creating Account");
@@ -115,11 +128,11 @@ public class RegisterActivity extends AppCompatActivity {
             Remail.setError("Enter Email");
             flag=1;
         }
-        else if (!Patterns.EMAIL_ADDRESS.matcher(Remail.getText().toString()).matches())
-        {
-            Remail.setError("Enter Valid Email");
-            flag=1;
-        }
+//        else if (!Patterns.EMAIL_ADDRESS.matcher(Remail.getText().toString()).matches())
+//        {
+//            Remail.setError("Enter Valid Email");
+//            flag=1;
+//        }
 
         if (Rpass.getText().toString().isEmpty())
         {
@@ -128,7 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
         else if (Rpass.getText().toString().length() <6 )
         {
-            Rpass.setError("Password Lenght greater then 6");
+            Rpass.setError("Password Length greater then 6");
             flag=1;
         }
 

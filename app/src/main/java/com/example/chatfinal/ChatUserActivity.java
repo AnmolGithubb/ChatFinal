@@ -1,4 +1,5 @@
 package com.example.chatfinal;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -22,6 +24,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -36,6 +41,8 @@ public class ChatUserActivity extends AppCompatActivity {
     ArrayList<MessagesModel> list=new ArrayList<>();
     ImageView pic,back,sendmsg;
     RecyclerView chat;
+    ImageView sendImage; // Add ImageView for sending images
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,18 @@ public class ChatUserActivity extends AppCompatActivity {
         chat =findViewById(R.id.chat);
         etmesage = findViewById(R.id.etmessage);
         back = findViewById(R.id.baclk);
+        sendImage = findViewById(R.id.sendImage);
+        sendImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open the image picker when the "send image" button is clicked
+                ImagePicker.with(ChatUserActivity.this)
+                        .galleryOnly()
+                        .compress(1024)
+                        .maxResultSize(1080, 1080)
+                        .start();
+            }
+        });
         final  String senderID= auth.getUid();  // making a variable make it global even inside declare inside any function
         String receverid= getIntent().getStringExtra("userId");
 
@@ -182,5 +201,57 @@ public class ChatUserActivity extends AppCompatActivity {
 
 
 
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Handle the image selected by the user
+        if (requestCode == ImagePicker.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                // Upload the image to Firebase Storage and send it in the chat
+                sendImageMessage(uri);
+            }
+        }
+    }
+
+    private void sendImageMessage(Uri imageUri) {
+        String senderID = auth.getUid();
+        String receiverID = getIntent().getStringExtra("userId");
+        final String senderRoom = senderID + receiverID;
+        final String receiverRoom = receiverID + senderID;
+
+        final MessagesModel imageModel = new MessagesModel(senderID, "", imageUri.toString());
+        imageModel.setType("image");
+        imageModel.setTimestamp(new Date().getTime());
+
+        // Upload the image to Firebase Storage
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        final String imageName = "image_" + System.currentTimeMillis();
+        StorageReference imageRef = storageReference.child("chats").child(senderRoom).child(imageName);
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get the download URL of the uploaded image
+                        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                // Update the image message with the image URL
+                                imageModel.setMessage(uri.toString());
+
+                                // Save the image message to sender and receiver chat rooms
+                                FirebaseDatabase.getInstance().getReference().child("chats")
+                                        .child(senderRoom).push().setValue(imageModel);
+                                FirebaseDatabase.getInstance().getReference().child("chats")
+                                        .child(receiverRoom).push().setValue(imageModel);
+
+                                // Notify the adapter to update the chat
+                                list.add(imageModel);
+                                messageAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                });
     }
 }

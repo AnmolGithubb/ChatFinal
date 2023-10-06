@@ -24,8 +24,9 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText email,pass;
     Button login;
-    TextView register;
+    TextView signUp;
     FirebaseAuth auth;
+    FirebaseUser currentUser;
     ProgressDialog progressDialog;
 
     FirebaseUser currentuser;
@@ -36,17 +37,17 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 // code from here
         auth = FirebaseAuth.getInstance();
-        currentuser = auth.getCurrentUser();
+        currentUser = auth.getCurrentUser();
         progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setTitle("Login to Account");
         progressDialog.setMessage("Loading");
 
         email = findViewById(R.id.editTextTextEmailAddress);
-        pass= findViewById(R.id.editTextTextPassword);
-        login = findViewById(R.id.btn_signIn);
-        register = findViewById(R.id.tvClickSignUp);
+        pass= findViewById(R.id.Rpassword);
+        login = findViewById(R.id.btn_SignIn);
+        signUp = findViewById(R.id.tvClickSignUp);
 
-        register.setOnClickListener(new View.OnClickListener() {
+        signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
@@ -86,11 +87,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
 
-
-
-
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (currentUser!= null){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
     private boolean validateField() {
@@ -101,11 +106,7 @@ public class LoginActivity extends AppCompatActivity {
             email.setError("Enter Email");
             flag =1;
         }
-        else if (!Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches())
-        {
-            email.setError("Enter Valid Email");
-            flag=1;
-        }
+
         if (pass.getText().toString().isEmpty())
         {
             pass.setError("Enter Password");

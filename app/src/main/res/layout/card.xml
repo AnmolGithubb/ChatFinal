@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/bb1"
 
     android:layout_height="wrap_content">
+
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/senderpic"
@@ -13,7 +15,7 @@
         android:layout_height="@dimen/_55mdp"
         android:layout_marginStart="@dimen/_5mdp"
         android:layout_marginTop="@dimen/_7mdp"
-        android:src="@drawable/profile"
+        android:src="@drawable/baseline_person_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +37,7 @@
             android:layout_marginStart="@dimen/_5mdp"
             android:layout_marginTop="@dimen/_15mdp"
             android:text="Vivek Penuli"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="@dimen/_15mdp"
             android:textStyle="bold" />
 

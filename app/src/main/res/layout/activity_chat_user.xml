@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/linear"
-        android:layout_below="@+id/materialToolbar2" >
+        android:layout_below="@+id/materialToolbar2"
+        android:background="@drawable/bb2">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -37,6 +38,14 @@
             android:inputType="textPersonName"
             android:textSize="@dimen/_18mdp"
             tools:ignore="TouchTargetSizeCheck" />
+
+
+        <ImageView
+            android:id="@+id/sendImage"
+            android:layout_width="@dimen/_3mdp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            tools:srcCompat="@drawable/addpic" />
 
         <ImageView
             android:id="@+id/send"

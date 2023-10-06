@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatfinal.Adapter.MyAdapter;
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
     MyAdapter myAdapter;
     ArrayList<User> list= new ArrayList<>();
 
-    ImageView userimg, uplimg;
+    ImageView userimg, uplimg,signout;
+    TextView name;
     ProgressDialog progressDialog;
     Uri uri;
     ImageView logout;
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         userimg  = findViewById(R.id.userimg);
         uplimg= findViewById(R.id.uploadimg);
+        signout = findViewById(R.id.logOut);
+        name =findViewById(R.id.textView3);
+
 
 
         recyclerView = findViewById(R.id.charrecv);
@@ -72,6 +77,22 @@ public class MainActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference();
         database = FirebaseDatabase.getInstance();
+
+        signout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Call the signOut method to log out the user
+                FirebaseAuth.getInstance().signOut();
+
+                // Create an Intent to navigate to LoginActivity
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+
+                // Clear all previous activities and start the LoginActivity as a new task
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish(); // Finish the current activity to prevent the user from coming back after logout
+            }
+        });
 
 
 
@@ -129,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                             .load(user.getProfile_photo())
                             .placeholder(R.drawable.profile)
                             .into(userimg);
+                    name.setText(user.getName());
 
                 }
             }
